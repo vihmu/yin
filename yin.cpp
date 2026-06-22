@@ -162,12 +162,14 @@ void get_files(void)
  */
 void play_random(void)
 {
+  char cmd[256];
   // TODO: Only run if file extension matches common audio formats?
   // TODO: system() seems to override the sig handler
   //       sleeping for 1 sec as a fix for now
-  string cmd(MPV);
-  string command = cmd + dir[ rand() % size(dir) + size(d) ];
-  system(command.c_str());
+  const char *song = dir[ rand()%size(dir)+size(d) ].c_str();
+  cout << "\n\n\t" << ESC << RED << song << RES << "\n" << endl;
+  snprintf(cmd, sizeof(cmd), "%s --no-video '%s'", MPV, song);
+  system(cmd);
 }
 
 void shuffle_quit(int sig)
