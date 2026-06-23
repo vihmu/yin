@@ -40,6 +40,7 @@
 #define K_DOWN  'j'
 #define K_LEFT  'h'
 #define K_RIGHT 'l'
+#define K_LOOP  'L'
 #define K_TOP   'g'
 #define K_BOT   'G'
 #define K_SHUF  's'
@@ -142,7 +143,7 @@ void get_files(void)
   }
 }
 
-// TODO: See play_random()
+// TODO: See play()
 //void exec(const string cmd)
 //{
 //  FILE* cpipe = popen(cmd.c_str(), "r");
@@ -160,15 +161,17 @@ void get_files(void)
 /*
  * Other
  */
-void play_random(void)
+void play(const char *song, bool loop)
 {
   char cmd[256];
   // TODO: Only run if file extension matches common audio formats?
   // TODO: system() seems to override the sig handler
   //       sleeping for 1 sec as a fix for now
-  const char *song = dir[ rand()%size(dir)+size(d) ].c_str();
   cout << "\n\n\t" << ESC << RED << song << RES << "\n" << endl;
-  snprintf(cmd, sizeof(cmd), "%s --no-video '%s'", MPV, song);
+  if (loop)
+    snprintf(cmd, sizeof(cmd), "%s --no-video --loop-file=inf \"%s\"", MPV, song);
+  else
+    snprintf(cmd, sizeof(cmd), "%s --no-video \"%s\"", MPV, song);
   system(cmd);
 }
 
@@ -178,6 +181,7 @@ void shuffle_quit(int sig)
   (void)sig;
   shuf = false;
 }
+
 void shuffle(void)
 {
   // Loop and play random songs in folder
@@ -191,7 +195,8 @@ void shuffle(void)
   sigaction(SIGINT, &handler, NULL);
 
   while (shuf) {
-    play_random();
+    const char *song = dir[ rand()%size(dir)+size(d) ].c_str();
+    play(song, false);
     sleep(1);
   }
 }
@@ -218,7 +223,8 @@ int main(void)
         cout << dir[i] << endl;
     }
 
-    switch (getch()) {
+    char key = getch();
+    switch (key) {
     case K_QUIT:
       quit = true;
       break;
@@ -235,6 +241,7 @@ int main(void)
       sel = size(dir) / 2;
       break;
     case K_RIGHT:
+    case K_LOOP:
       if (sel < size(d)) {
         filesystem::current_path(d[sel]);
         clear();
@@ -242,6 +249,15 @@ int main(void)
         sel = 0;
       } else {
         info = dir[sel];
+        const char *song = dir[sel].c_str();
+        // Looping
+        if (key == K_LOOP)
+          play(song, true);
+        else
+          play(song, false);
+        // Hide cursor again and clear the screen
+        cursor(false);
+        clear();
       }
       break;
     case K_SHUF:
