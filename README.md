@@ -1,6 +1,6 @@
 # yin (音)
 
-Small terminal music player written in plain BASH.
+Small terminal music player written in C++17.
 It uses [mpv](https://mpv.io/) for playback.
 
 Work in progress! 
