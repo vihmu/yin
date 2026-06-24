@@ -5,6 +5,12 @@ It uses [mpv](https://mpv.io/) for playback.
 
 Work in progress! 
 
+## usage
+
+```
+$ yin [directory]
+```
+
 ## keybinds
 
 - j/k: cycle up/down

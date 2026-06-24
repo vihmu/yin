@@ -33,6 +33,7 @@
 #include <signal.h>
 #include <termios.h>
 
+#define VERSION "0.1.1"
 #define MPV     "mpv "
 // Keys
 #define K_QUIT  'q'
@@ -202,8 +203,23 @@ void shuffle(void)
 }
 
 
-int main(void)
+int main(int argc, char **argv)
 {
+  // Handle terminal args
+  if (argc > 1) {
+    if (string(argv[1]) == "-h") {
+      cout << "yin (" << VERSION << ") - tiny terminal music player based on mpv" << endl;
+      cout << "usage: yin [directory]" << endl;
+      exit(2);
+    }
+    error_code ec;
+    filesystem::current_path(argv[1], ec);
+    // Ignore given path if not available
+    if (ec) {
+      filesystem::current_path(".");
+      info = "Unknown path.";
+    }
+  }
   // Initialize files array
   get_files();
 
